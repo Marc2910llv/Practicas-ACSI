@@ -1,0 +1,115 @@
+ 
+  SIMULOG   ***  QNAP2  ***  ( 28-02-1999  ) V 9.4   
+  (C)  COPYRIGHT BY CII HONEYWELL BULL AND INRIA, 1986
+ 
+ 
+      1 /DECLARE/ QUEUE CPU,DISC(2),TERMINAL;
+      2           REAL PROB1(2)=(4.,4.);
+      3           REAL TTR1,TOTAL,WORK;
+      4           INTEGER I,N1,V1,V2,V3,M1,M2,M3,D1,D2,D3;
+      5 /STATION/ NAME=CPU;
+      6 &         SCHED=PS;
+      7           SERVICE=EXP(0.1083);
+      8           TRANSIT=DISC,PROB1,TERMINAL,1;
+      9 /STATION/ NAME=DISC;
+     10           TRANSIT=CPU;
+     11 /STATION/ NAME=DISC(1);
+     12           SERVICE=EXP(0.1083);
+     13 /STATION/ NAME=DISC(2);
+     14           SERVICE=EXP(0.1083);
+     15 /STATION/ NAME=TERMINAL;
+     16           TYPE=INFINITE;
+     17           INIT=N1;
+     18           SERVICE=EXP(8.);
+     19           TRANSIT=CPU;
+     20 /CONTROL/ CLASS=ALL QUEUE;
+     21 /EXEC/    FOR N1:=20 STEP 10 UNTIL 20 DO
+     22           BEGIN
+     23             PRINT;
+     24             PRINT("");
+     25             PRINT("NUMERO DE USUARIOS=",N1);
+     26             SOLVE;
+     27             PRINT("");
+     28             V2:=PROB1(1);
+     29             V3:=PROB1(2);
+     30             V1:=V2+V3+1;
+     31             PRINT("");
+     32             PRINT("RAZÓN DE VISITA CPU             =",V1);
+     33             PRINT("RAZÓN DE VISITA DISC1           =",V2);
+     34             PRINT("RAZÓN DE VISITA DISC2           =",V3);
+     35             PRINT("");
+     36             PRINT("TIEMPO DE SERVICIO CPU          =",MSERVICE(CPU));
+     37             PRINT("TIEMPO DE SERVICIO DISC1        =",MSERVICE(DISC(1)))
+;
+     38             PRINT("TIEMPO DE SERVICIO DISC2        =",MSERVICE(DISC(2)))
+;
+     39             PRINT("");
+     40             PRINT("DEMANDA CPU                     =",(V2+V3+1)*MSERVICE
+(CPU));
+     41             PRINT("DEMANDA DISC1                   =",PROB1(1)*MSERVICE(
+DISC(1)));
+     42             PRINT("DEMANDA DISC2                   =",PROB1(2)*MSERVICE(
+DISC(2)));
+     43             PRINT("");
+     44             PRINT("TRABAJOS TOTALES                =",N1);
+     45             PRINT("PRODUCTIVIDAD DEL SISTEMA       =",MTHRUPUT(TERMINAL)
+);
+     46             PRINT("TIEMPO DE REFLEXIÓN             =",MRESPONSE(TERMINA
+L));
+     47             PRINT("");
+     48             PRINT("TIEMPO DE RESPUESTA DEL SISTEMA =",(N1/MTHRUPUT(TERMI
+NAL))-MRESPONSE(TERMINAL));
+     49             PRINT("");
+     50             PRINT("TIEMPO TOTAL DEL SISTEMA        =",(N1/MTHRUPUT(TERMI
+NAL)));
+     51             PRINT("");
+     52             PRINT("USUARIOS TRABAJANDO             =",N1-MCUSTNB(TERMINA
+L));
+     53             PRINT("USUARIOS REFLEXIONANDO          =",MCUSTNB(TERMINAL))
+;
+     54           END;
+ 
+1
+ 
+ NUMERO DE USUARIOS=       20 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.1083    *0.9974    * 10.23    * 1.111    * 9.209    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.1083    *0.4433    *0.7922    *0.1935    * 4.093    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.1083    *0.4433    *0.7922    *0.1935    * 4.093    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 8.000    *0.0000E+00* 8.186    * 8.000    * 1.023    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       7732 WORDS OF 4 BYTES
+               (  0.15  % OF TOTAL MEMORY)
+ 
+ 
+ RAZÓN DE VISITA CPU             =        9 
+ RAZÓN DE VISITA DISC1           =        4 
+ RAZÓN DE VISITA DISC2           =        4 
+ 
+ TIEMPO DE SERVICIO CPU          =  0.1083    
+ TIEMPO DE SERVICIO DISC1        =  0.1083    
+ TIEMPO DE SERVICIO DISC2        =  0.1083    
+ 
+ DEMANDA CPU                     =  0.9747    
+ DEMANDA DISC1                   =  0.4332    
+ DEMANDA DISC2                   =  0.4332    
+ 
+ TRABAJOS TOTALES                =       20 
+ PRODUCTIVIDAD DEL SISTEMA       =   1.023    
+ TIEMPO DE REFLEXIÓN             =   8.000    
+ 
+ TIEMPO DE RESPUESTA DEL SISTEMA =   11.55    
+ 
+ TIEMPO TOTAL DEL SISTEMA        =   19.55    
+ 
+ USUARIOS TRABAJANDO             =   11.81    
+ USUARIOS REFLEXIONANDO          =   8.186    
+     55 /END/

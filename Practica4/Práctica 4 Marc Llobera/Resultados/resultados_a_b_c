@@ -1,0 +1,125 @@
+ 
+  SIMULOG   ***  QNAP2  ***  ( 28-02-1999  ) V 9.4   
+  (C)  COPYRIGHT BY CII HONEYWELL BULL AND INRIA, 1986
+ 
+ 
+      1 /DECLARE/ QUEUE CPU,DISC(2),TERMINAL;
+      2           REAL PROB1(2)=(7.,1.);
+      3           REAL TTR1,TOTAL,WORK;
+      4           INTEGER I,N1,V1,V2,V3,M1,M2,M3,D1,D2,D3;
+      5 /STATION/ NAME=CPU;
+      6 &         SCHED=PS;
+      7           SERVICE=EXP(0.005);
+      8           TRANSIT=DISC,PROB1,TERMINAL,1;
+      9 /STATION/ NAME=DISC;
+     10           TRANSIT=CPU;
+     11 /STATION/ NAME=DISC(1);
+     12           SERVICE=EXP(0.02);
+     13 /STATION/ NAME=DISC(2);
+     14           SERVICE=EXP(0.3);
+     15 /STATION/ NAME=TERMINAL;
+     16           TYPE=INFINITE;
+     17           INIT=N1;
+     18           SERVICE=EXP(8.);
+     19           TRANSIT=CPU;
+     20 /CONTROL/ CLASS=ALL QUEUE;
+     21 /EXEC/    FOR N1:=20 STEP 10 UNTIL 20 DO
+     22           BEGIN
+     23             PRINT;
+     24             PRINT("APARTADO A");
+     25             PRINT("");
+     26             PRINT("NUMERO DE USUARIOS=",N1);
+     27             SOLVE;
+     28             PRINT("");
+     29             PRINT("APARTADO B");
+     30             PRINT("");
+     31             V2:=PROB1(1);
+     32             V3:=PROB1(2);
+     33             V1:=V2+V3+1;
+     34             PRINT("");
+     35             PRINT("RAZÓN DE VISITA CPU             =",V1);
+     36             PRINT("RAZÓN DE VISITA DISC1           =",V2);
+     37             PRINT("RAZÓN DE VISITA DISC2           =",V3);
+     38             PRINT("");
+     39             PRINT("TIEMPO DE SERVICIO CPU          =",MSERVICE(CPU));
+     40             PRINT("TIEMPO DE SERVICIO DISC1        =",MSERVICE(DISC(1)))
+;
+     41             PRINT("TIEMPO DE SERVICIO DISC2        =",MSERVICE(DISC(2)))
+;
+     42             PRINT("");
+     43             PRINT("DEMANDA CPU                     =",(V2+V3+1)*MSERVICE
+(CPU));
+     44             PRINT("DEMANDA DISC1                   =",PROB1(1)*MSERVICE(
+DISC(1)));
+     45             PRINT("DEMANDA DISC2                   =",PROB1(2)*MSERVICE(
+DISC(2)));
+     46             PRINT("");
+     47             PRINT("APARTADO C");
+     48             PRINT("");
+     49             PRINT("TRABAJOS TOTALES                =",N1);
+     50             PRINT("PRODUCTIVIDAD DEL SISTEMA       =",MTHRUPUT(TERMINAL)
+);
+     51             PRINT("TIEMPO DE REFLEXIÓN             =",MRESPONSE(TERMINA
+L));
+     52             PRINT("");
+     53             PRINT("TIEMPO DE RESPUESTA DEL SISTEMA =",(N1/MTHRUPUT(TERMI
+NAL))-MRESPONSE(TERMINAL));
+     54             PRINT("");
+     55             PRINT("TIEMPO TOTAL DEL SISTEMA        =",(N1/MTHRUPUT(TERMI
+NAL)));
+     56             PRINT("");
+     57             PRINT("USUARIOS TRABAJANDO             =",N1-MCUSTNB(TERMINA
+L));
+     58             PRINT("USUARIOS REFLEXIONANDO          =",MCUSTNB(TERMINAL))
+;
+     59           END;
+ 
+1
+ APARTADO A
+ 
+ NUMERO DE USUARIOS=       20 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.5000E-02*0.1001    *0.1106    *0.5526E-02* 20.02    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.2000E-01*0.3114    *0.4397    *0.2824E-01* 15.57    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.3000    *0.6672    * 1.657    *0.7449    * 2.224    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 8.000    *0.0000E+00* 17.79    * 8.000    * 2.224    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       7790 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ APARTADO B
+ 
+ 
+ RAZÓN DE VISITA CPU             =        9 
+ RAZÓN DE VISITA DISC1           =        7 
+ RAZÓN DE VISITA DISC2           =        1 
+ 
+ TIEMPO DE SERVICIO CPU          =  0.5000E-02
+ TIEMPO DE SERVICIO DISC1        =  0.2000E-01
+ TIEMPO DE SERVICIO DISC2        =  0.3000    
+ 
+ DEMANDA CPU                     =  0.4500E-01
+ DEMANDA DISC1                   =  0.1400    
+ DEMANDA DISC2                   =  0.3000    
+ 
+ APARTADO C
+ 
+ TRABAJOS TOTALES                =       20 
+ PRODUCTIVIDAD DEL SISTEMA       =   2.224    
+ TIEMPO DE REFLEXIÓN             =   8.000    
+ 
+ TIEMPO DE RESPUESTA DEL SISTEMA =  0.9923    
+ 
+ TIEMPO TOTAL DEL SISTEMA        =   8.992    
+ 
+ USUARIOS TRABAJANDO             =   2.207    
+ USUARIOS REFLEXIONANDO          =   17.79    
+     60 /END/

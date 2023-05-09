@@ -1,0 +1,500 @@
+ 
+  SIMULOG   ***  QNAP2  ***  ( 28-02-1999  ) V 9.4   
+  (C)  COPYRIGHT BY CII HONEYWELL BULL AND INRIA, 1986
+ 
+ 
+      1 /DECLARE/ QUEUE CPU,DISC(2),TERMINAL;
+      2           REAL PROB1(2)=(7.,1.);
+      3           REAL TTR1,TOTAL,WORK;
+      4           INTEGER I,N1,V1,V2,V3;
+      5 /STATION/ NAME=CPU;
+      6 &         SCHED=PS;
+      7           SERVICE=EXP(0.005);
+      8           TRANSIT=DISC,PROB1,TERMINAL,1;
+      9 /STATION/ NAME=DISC;
+     10           TRANSIT=CPU;
+     11 /STATION/ NAME=DISC(1);
+     12           SERVICE=EXP(0.02);
+     13 /STATION/ NAME=DISC(2);
+     14           SERVICE=EXP(0.3);
+     15 /STATION/ NAME=TERMINAL;
+     16           TYPE=INFINITE;
+     17           INIT=N1;
+     18           SERVICE=EXP(16.);
+     19           TRANSIT=CPU;
+     20 /CONTROL/ CLASS=ALL QUEUE;
+     21 /EXEC/    FOR N1:=10 STEP 10 UNTIL 100 DO
+     22           BEGIN
+     23             PRINT;
+     24             PRINT("NUMERO DE USUARIOS=",N1);
+     25             SOLVE;
+     26             PRINT("");
+     27             V2:=PROB1(1);
+     28             V3:=PROB1(2);
+     29             V1:=V2+V3+1;
+     30             PRINT("");
+     31             PRINT("RAZÓN DE VISITA CPU             =",V1);
+     32             PRINT("RAZÓN DE VISITA DISC1           =",V2);
+     33             PRINT("RAZÓN DE VISITA DISC2           =",V3);
+     34             PRINT("");
+     35             PRINT("TIEMPO DE SERVICIO CPU          =",MSERVICE(CPU));
+     36             PRINT("TIEMPO DE SERVICIO DISC1        =",MSERVICE(DISC(1)))
+;
+     37             PRINT("TIEMPO DE SERVICIO DISC2        =",MSERVICE(DISC(2)))
+;
+     38             PRINT("");
+     39             PRINT("DEMANDA CPU                     =",(V2+V3+1)*MSERVICE
+(CPU));
+     40             PRINT("DEMANDA DISC1                   =",PROB1(1)*MSERVICE(
+DISC(1)));
+     41             PRINT("DEMANDA DISC2                   =",PROB1(2)*MSERVICE(
+DISC(2)));
+     42             PRINT("");
+     43             PRINT("TRABAJOS TOTALES                =",N1);
+     44             PRINT("PRODUCTIVIDAD DEL SISTEMA       =",MTHRUPUT(TERMINAL)
+);
+     45             PRINT("TIEMPO DE REFLEXIÓN             =",MRESPONSE(TERMINA
+L));
+     46             PRINT("");
+     47             PRINT("TIEMPO DE RESPUESTA DEL SISTEMA =",(N1/MTHRUPUT(TERMI
+NAL))-MRESPONSE(TERMINAL));
+     48             PRINT("");
+     49             PRINT("TIEMPO TOTAL DEL SISTEMA        =",(N1/MTHRUPUT(TERMI
+NAL)));
+     50             PRINT("");
+     51             PRINT("USUARIOS TRABAJANDO             =",N1-MCUSTNB(TERMINA
+L));
+     52             PRINT("USUARIOS REFLEXIONANDO          =",MCUSTNB(TERMINAL))
+;
+     53           END;
+ 
+1
+ NUMERO DE USUARIOS=       10 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.5000E-02*0.2718E-01*0.2786E-01*0.5125E-02* 5.437    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.2000E-01*0.8457E-01*0.9147E-01*0.2163E-01* 4.228    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.3000    *0.1812    *0.2157    *0.3571    *0.6041    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 16.00    *0.0000E+00* 9.665    * 16.00    *0.6041    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       7664 WORDS OF 4 BYTES
+               (  0.15  % OF TOTAL MEMORY)
+ 
+ 
+ RAZÓN DE VISITA CPU             =        9 
+ RAZÓN DE VISITA DISC1           =        7 
+ RAZÓN DE VISITA DISC2           =        1 
+ 
+ TIEMPO DE SERVICIO CPU          =  0.5000E-02
+ TIEMPO DE SERVICIO DISC1        =  0.2000E-01
+ TIEMPO DE SERVICIO DISC2        =  0.3000    
+ 
+ DEMANDA CPU                     =  0.4500E-01
+ DEMANDA DISC1                   =  0.1400    
+ DEMANDA DISC2                   =  0.3000    
+ 
+ TRABAJOS TOTALES                =       10 
+ PRODUCTIVIDAD DEL SISTEMA       =  0.6041    
+ TIEMPO DE REFLEXIÓN             =   16.00    
+ 
+ TIEMPO DE RESPUESTA DEL SISTEMA =  0.5546    
+ 
+ TIEMPO TOTAL DEL SISTEMA        =   16.55    
+ 
+ USUARIOS TRABAJANDO             =  0.3350    
+ USUARIOS REFLEXIONANDO          =   9.665    
+ 
+1
+ NUMERO DE USUARIOS=       20 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.5000E-02*0.5401E-01*0.5692E-01*0.5270E-02* 10.80    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.2000E-01*0.1680    *0.1996    *0.2376E-01* 8.401    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.3000    *0.3601    *0.5404    *0.4503    * 1.200    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 16.00    *0.0000E+00* 19.20    * 16.00    * 1.200    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       7687 WORDS OF 4 BYTES
+               (  0.15  % OF TOTAL MEMORY)
+ 
+ 
+ RAZÓN DE VISITA CPU             =        9 
+ RAZÓN DE VISITA DISC1           =        7 
+ RAZÓN DE VISITA DISC2           =        1 
+ 
+ TIEMPO DE SERVICIO CPU          =  0.5000E-02
+ TIEMPO DE SERVICIO DISC1        =  0.2000E-01
+ TIEMPO DE SERVICIO DISC2        =  0.3000    
+ 
+ DEMANDA CPU                     =  0.4500E-01
+ DEMANDA DISC1                   =  0.1400    
+ DEMANDA DISC2                   =  0.3000    
+ 
+ TRABAJOS TOTALES                =       20 
+ PRODUCTIVIDAD DEL SISTEMA       =   1.200    
+ TIEMPO DE REFLEXIÓN             =   16.00    
+ 
+ TIEMPO DE RESPUESTA DEL SISTEMA =  0.6640    
+ 
+ TIEMPO TOTAL DEL SISTEMA        =   16.66    
+ 
+ USUARIOS TRABAJANDO             =  0.7969    
+ USUARIOS REFLEXIONANDO          =   19.20    
+ 
+1
+ NUMERO DE USUARIOS=       30 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.5000E-02*0.8019E-01*0.8692E-01*0.5419E-02* 16.04    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.2000E-01*0.2495    *0.3278    *0.2628E-01* 12.47    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.3000    *0.5346    * 1.072    *0.6013    * 1.782    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 16.00    *0.0000E+00* 28.51    * 16.00    * 1.782    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       7710 WORDS OF 4 BYTES
+               (  0.15  % OF TOTAL MEMORY)
+ 
+ 
+ RAZÓN DE VISITA CPU             =        9 
+ RAZÓN DE VISITA DISC1           =        7 
+ RAZÓN DE VISITA DISC2           =        1 
+ 
+ TIEMPO DE SERVICIO CPU          =  0.5000E-02
+ TIEMPO DE SERVICIO DISC1        =  0.2000E-01
+ TIEMPO DE SERVICIO DISC2        =  0.3000    
+ 
+ DEMANDA CPU                     =  0.4500E-01
+ DEMANDA DISC1                   =  0.1400    
+ DEMANDA DISC2                   =  0.3000    
+ 
+ TRABAJOS TOTALES                =       30 
+ PRODUCTIVIDAD DEL SISTEMA       =   1.782    
+ TIEMPO DE REFLEXIÓN             =   16.00    
+ 
+ TIEMPO DE RESPUESTA DEL SISTEMA =  0.8340    
+ 
+ TIEMPO TOTAL DEL SISTEMA        =   16.83    
+ 
+ USUARIOS TRABAJANDO             =   1.486    
+ USUARIOS REFLEXIONANDO          =   28.51    
+ 
+1
+ NUMERO DE USUARIOS=       40 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.5000E-02*0.1051    *0.1171    *0.5571E-02* 21.02    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.2000E-01*0.3269    *0.4780    *0.2924E-01* 16.35    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.3000    *0.7006    * 2.039    *0.8732    * 2.335    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 16.00    *0.0000E+00* 37.37    * 16.00    * 2.335    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       7733 WORDS OF 4 BYTES
+               (  0.15  % OF TOTAL MEMORY)
+ 
+ 
+ RAZÓN DE VISITA CPU             =        9 
+ RAZÓN DE VISITA DISC1           =        7 
+ RAZÓN DE VISITA DISC2           =        1 
+ 
+ TIEMPO DE SERVICIO CPU          =  0.5000E-02
+ TIEMPO DE SERVICIO DISC1        =  0.2000E-01
+ TIEMPO DE SERVICIO DISC2        =  0.3000    
+ 
+ DEMANDA CPU                     =  0.4500E-01
+ DEMANDA DISC1                   =  0.1400    
+ DEMANDA DISC2                   =  0.3000    
+ 
+ TRABAJOS TOTALES                =       40 
+ PRODUCTIVIDAD DEL SISTEMA       =   2.335    
+ TIEMPO DE REFLEXIÓN             =   16.00    
+ 
+ TIEMPO DE RESPUESTA DEL SISTEMA =   1.128    
+ 
+ TIEMPO TOTAL DEL SISTEMA        =   17.13    
+ 
+ USUARIOS TRABAJANDO             =   2.634    
+ USUARIOS REFLEXIONANDO          =   37.37    
+ 
+1
+ NUMERO DE USUARIOS=       50 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.5000E-02*0.1271    *0.1452    *0.5713E-02* 25.42    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.2000E-01*0.3954    *0.6431    *0.3253E-01* 19.77    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.3000    *0.8473    * 4.024    * 1.425    * 2.824    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 16.00    *0.0000E+00* 45.19    * 16.00    * 2.824    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       7756 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ 
+ RAZÓN DE VISITA CPU             =        9 
+ RAZÓN DE VISITA DISC1           =        7 
+ RAZÓN DE VISITA DISC2           =        1 
+ 
+ TIEMPO DE SERVICIO CPU          =  0.5000E-02
+ TIEMPO DE SERVICIO DISC1        =  0.2000E-01
+ TIEMPO DE SERVICIO DISC2        =  0.3000    
+ 
+ DEMANDA CPU                     =  0.4500E-01
+ DEMANDA DISC1                   =  0.1400    
+ DEMANDA DISC2                   =  0.3000    
+ 
+ TRABAJOS TOTALES                =       50 
+ PRODUCTIVIDAD DEL SISTEMA       =   2.824    
+ TIEMPO DE REFLEXIÓN             =   16.00    
+ 
+ TIEMPO DE RESPUESTA DEL SISTEMA =   1.704    
+ 
+ TIEMPO TOTAL DEL SISTEMA        =   17.70    
+ 
+ USUARIOS TRABAJANDO             =   4.813    
+ USUARIOS REFLEXIONANDO          =   45.19    
+ 
+1
+ NUMERO DE USUARIOS=       60 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.5000E-02*0.1427    *0.1662    *0.5823E-02* 28.54    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.2000E-01*0.4440    *0.7891    *0.3554E-01* 22.20    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.3000    *0.9515    * 8.299    * 2.617    * 3.172    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 16.00    *0.0000E+00* 50.75    * 16.00    * 3.172    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       7779 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ 
+ RAZÓN DE VISITA CPU             =        9 
+ RAZÓN DE VISITA DISC1           =        7 
+ RAZÓN DE VISITA DISC2           =        1 
+ 
+ TIEMPO DE SERVICIO CPU          =  0.5000E-02
+ TIEMPO DE SERVICIO DISC1        =  0.2000E-01
+ TIEMPO DE SERVICIO DISC2        =  0.3000    
+ 
+ DEMANDA CPU                     =  0.4500E-01
+ DEMANDA DISC1                   =  0.1400    
+ DEMANDA DISC2                   =  0.3000    
+ 
+ TRABAJOS TOTALES                =       60 
+ PRODUCTIVIDAD DEL SISTEMA       =   3.172    
+ TIEMPO DE REFLEXIÓN             =   16.00    
+ 
+ TIEMPO DE RESPUESTA DEL SISTEMA =   2.918    
+ 
+ TIEMPO TOTAL DEL SISTEMA        =   18.92    
+ 
+ USUARIOS TRABAJANDO             =   9.254    
+ USUARIOS REFLEXIONANDO          =   50.75    
+ 
+1
+ NUMERO DE USUARIOS=       70 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.5000E-02*0.1490    *0.1751    *0.5873E-02* 29.81    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.2000E-01*0.4637    *0.8615    *0.3716E-01* 23.18    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.3000    *0.9936    * 15.97    * 4.822    * 3.312    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 16.00    *0.0000E+00* 52.99    * 16.00    * 3.312    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       7802 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ 
+ RAZÓN DE VISITA CPU             =        9 
+ RAZÓN DE VISITA DISC1           =        7 
+ RAZÓN DE VISITA DISC2           =        1 
+ 
+ TIEMPO DE SERVICIO CPU          =  0.5000E-02
+ TIEMPO DE SERVICIO DISC1        =  0.2000E-01
+ TIEMPO DE SERVICIO DISC2        =  0.3000    
+ 
+ DEMANDA CPU                     =  0.4500E-01
+ DEMANDA DISC1                   =  0.1400    
+ DEMANDA DISC2                   =  0.3000    
+ 
+ TRABAJOS TOTALES                =       70 
+ PRODUCTIVIDAD DEL SISTEMA       =   3.312    
+ TIEMPO DE REFLEXIÓN             =   16.00    
+ 
+ TIEMPO DE RESPUESTA DEL SISTEMA =   5.135    
+ 
+ TIEMPO TOTAL DEL SISTEMA        =   21.13    
+ 
+ USUARIOS TRABAJANDO             =   17.01    
+ USUARIOS REFLEXIONANDO          =   52.99    
+ 
+1
+ NUMERO DE USUARIOS=       80 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.5000E-02*0.1500    *0.1764    *0.5882E-02* 29.99    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.2000E-01*0.4665    *0.8743    *0.3748E-01* 23.33    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.3000    *0.9997    * 25.63    * 7.691    * 3.332    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 16.00    *0.0000E+00* 53.32    * 16.00    * 3.332    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       7825 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ 
+ RAZÓN DE VISITA CPU             =        9 
+ RAZÓN DE VISITA DISC1           =        7 
+ RAZÓN DE VISITA DISC2           =        1 
+ 
+ TIEMPO DE SERVICIO CPU          =  0.5000E-02
+ TIEMPO DE SERVICIO DISC1        =  0.2000E-01
+ TIEMPO DE SERVICIO DISC2        =  0.3000    
+ 
+ DEMANDA CPU                     =  0.4500E-01
+ DEMANDA DISC1                   =  0.1400    
+ DEMANDA DISC2                   =  0.3000    
+ 
+ TRABAJOS TOTALES                =       80 
+ PRODUCTIVIDAD DEL SISTEMA       =   3.332    
+ TIEMPO DE REFLEXIÓN             =   16.00    
+ 
+ TIEMPO DE RESPUESTA DEL SISTEMA =   8.006    
+ 
+ TIEMPO TOTAL DEL SISTEMA        =   24.01    
+ 
+ USUARIOS TRABAJANDO             =   26.68    
+ USUARIOS REFLEXIONANDO          =   53.32    
+ 
+1
+ NUMERO DE USUARIOS=       90 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.5000E-02*0.1500    *0.1765    *0.5882E-02* 30.00    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.2000E-01*0.4667    *0.8750    *0.3750E-01* 23.33    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.3000    * 1.000    * 35.62    * 10.68    * 3.333    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 16.00    *0.0000E+00* 53.33    * 16.00    * 3.333    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       7848 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ 
+ RAZÓN DE VISITA CPU             =        9 
+ RAZÓN DE VISITA DISC1           =        7 
+ RAZÓN DE VISITA DISC2           =        1 
+ 
+ TIEMPO DE SERVICIO CPU          =  0.5000E-02
+ TIEMPO DE SERVICIO DISC1        =  0.2000E-01
+ TIEMPO DE SERVICIO DISC2        =  0.3000    
+ 
+ DEMANDA CPU                     =  0.4500E-01
+ DEMANDA DISC1                   =  0.1400    
+ DEMANDA DISC2                   =  0.3000    
+ 
+ TRABAJOS TOTALES                =       90 
+ PRODUCTIVIDAD DEL SISTEMA       =   3.333    
+ TIEMPO DE REFLEXIÓN             =   16.00    
+ 
+ TIEMPO DE RESPUESTA DEL SISTEMA =   11.00    
+ 
+ TIEMPO TOTAL DEL SISTEMA        =   27.00    
+ 
+ USUARIOS TRABAJANDO             =   36.67    
+ USUARIOS REFLEXIONANDO          =   53.33    
+ 
+1
+ NUMERO DE USUARIOS=      100 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.5000E-02*0.1500    *0.1765    *0.5882E-02* 30.00    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.2000E-01*0.4667    *0.8750    *0.3750E-01* 23.33    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.3000    * 1.000    * 45.62    * 13.68    * 3.333    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 16.00    *0.0000E+00* 53.33    * 16.00    * 3.333    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       7871 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ 
+ RAZÓN DE VISITA CPU             =        9 
+ RAZÓN DE VISITA DISC1           =        7 
+ RAZÓN DE VISITA DISC2           =        1 
+ 
+ TIEMPO DE SERVICIO CPU          =  0.5000E-02
+ TIEMPO DE SERVICIO DISC1        =  0.2000E-01
+ TIEMPO DE SERVICIO DISC2        =  0.3000    
+ 
+ DEMANDA CPU                     =  0.4500E-01
+ DEMANDA DISC1                   =  0.1400    
+ DEMANDA DISC2                   =  0.3000    
+ 
+ TRABAJOS TOTALES                =      100 
+ PRODUCTIVIDAD DEL SISTEMA       =   3.333    
+ TIEMPO DE REFLEXIÓN             =   16.00    
+ 
+ TIEMPO DE RESPUESTA DEL SISTEMA =   14.00    
+ 
+ TIEMPO TOTAL DEL SISTEMA        =   30.00    
+ 
+ USUARIOS TRABAJANDO             =   46.67    
+ USUARIOS REFLEXIONANDO          =   53.33    
+     54 /END/

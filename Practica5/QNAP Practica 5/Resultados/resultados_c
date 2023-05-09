@@ -1,0 +1,619 @@
+ 
+  SIMULOG   ***  QNAP2  ***  ( 28-02-1999  ) V 9.4   
+  (C)  COPYRIGHT BY CII HONEYWELL BULL AND INRIA, 1986
+ 
+ 
+      1 /DECLARE/ QUEUE CPU,DISC(2),TERMINAL;
+      2           REAL PROB(2)=(7.,7.);
+      3           REAL TTR1,TOTAL,WORK,SCPU,SDISCO1,SDISCO2,DCPU,DDISCO1,DDISCO2
+,DEMANDA,XO,ZTIME,RTIME;
+      4           INTEGER I,N1,V1,V2,V3,PSATURACION;
+ (060301)  ==>WARNING (DECLARE) : THIS IDENTIFIER IS TOO LONG
+                                  (TRUNCATED) : PSATURAC
+      5 /STATION/ NAME=CPU;
+      6 &         SCHED=PS;
+      7           SERVICE=EXP(0.043333);
+      8           TRANSIT=DISC,PROB,TERMINAL,1;
+      9 /STATION/ NAME=DISC;
+     10           TRANSIT=CPU;
+     11 /STATION/ NAME=DISC(1);
+     12           SERVICE=EXP(0.043333);
+     13 /STATION/ NAME=DISC(2);
+     14           SERVICE=EXP(0.043333);
+     15 /STATION/ NAME=TERMINAL;
+     16           TYPE=INFINITE;
+     17           INIT=N1;
+     18           SERVICE=EXP(8.);
+     19           TRANSIT=CPU;
+     20 /CONTROL/ CLASS=ALL QUEUE;
+     21 /EXEC/    FOR N1:=1 STEP 1 UNTIL 10 DO
+     22           BEGIN
+     23             PRINT;
+     24             PRINT("NUMERO DE USUARIOS=",N1);
+     25             SOLVE;
+     26             PRINT("");
+     27             PRINT("APARTADO a");
+     28             PRINT("");
+     29             V2:=PROB(1);
+     30             V3:=PROB(2);
+     31             V1:=V2+V3+1;
+     32             PRINT("RAZÓN DE VISITA CPU (Vcpu)            =",V1);
+     33             PRINT("RAZÓN DE VISITA DISC1 (Vdisco1)       =",V2);
+     34             PRINT("RAZÓN DE VISITA DISC2 (Vdisco2)       =",V3);
+     35             PRINT("");
+     36             SCPU:=MSERVICE(CPU);
+     37             SDISCO1:=MSERVICE(DISC(1));
+     38             SDISCO2:=MSERVICE(DISC(2));
+     39             PRINT("TIEMPO DE SERVICIO CPU (Scpu)         =",SCPU);
+     40             PRINT("TIEMPO DE SERVICIO DISC1 (Sdisco1)    =",SDISCO1);
+     41             PRINT("TIEMPO DE SERVICIO DISC2 (Sdisco2)    =",SDISCO1);
+     42             PRINT("");
+     43             DCPU:=V1*SCPU;
+     44             DDISCO1:=V2*SDISCO1;
+     45             DDISCO2:=V3*SDISCO2;
+     46             PRINT("*DEMANDA CPU (Dcpu)*                  =",DCPU);
+     47             PRINT("*DEMANDA DISC1 (Ddisco1)*             =",DDISCO1);
+     48             PRINT("*DEMANDA DISC2 (Ddisco2)*             =",DDISCO2);
+     49             PRINT("");
+     50             DEMANDA:=DCPU+DDISCO1+DDISCO2;
+     51             PRINT("*DEMANDA DEL SISTEMA (D)*             =",DEMANDA);
+     52             PRINT("");
+     53             PRINT("*CUELLO DE BOTELLA (Db)*              =",MAX(DCPU,DDI
+SCO1,DDISCO2));
+     54             PRINT("");
+     55             ZTIME:=MRESPONSE(TERMINAL);
+     56             PRINT("TIEMPO DE REFLEXIÓN (Z)               =",ZTIME);
+     57             PRINT("");
+     58             PSATURACION:=INTROUND((DEMANDA+ZTIME)/MAX(DCPU,DDISCO1,DDISC
+O2));
+     59             PRINT("*PUNTO DE SATURACIÓN (N*)*            =",PSATURACION
+);
+     60             PRINT("");
+     61             PRINT("APARTADO b");
+     62             PRINT("");
+     63             PRINT("TRABAJOS TOTALES (N)                  =",N1);
+     64             XO:=MTHRUPUT(TERMINAL);
+     65             PRINT("PRODUCTIVIDAD DEL SISTEMA (Xo)        =",XO);
+     66             PRINT("");
+     67             RTIME:=(N1/XO)-ZTIME;
+     68             PRINT("*TIEMPO DE RESPUESTA DEL SISTEMA (R)* =",RTIME);
+     69             PRINT("");
+     70             PRINT("*TIEMPO TOTAL DEL SISTEMA (R+Z)*      =",RTIME+ZTIME)
+;
+     71             PRINT("");
+     72             PRINT("*USUARIOS TRABAJANDO*                 =",N1-MCUSTNB(T
+ERMINAL));
+     73             PRINT("*USUARIOS REFLEXIONANDO*              =",MCUSTNB(TERM
+INAL));
+     74           END;
+ 
+1
+ NUMERO DE USUARIOS=        1 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.4333E-01*0.7022E-01*0.7022E-01*0.4333E-01* 1.620    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.4333E-01*0.3277E-01*0.3277E-01*0.4333E-01*0.7562    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.4333E-01*0.3277E-01*0.3277E-01*0.4333E-01*0.7562    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 8.000    *0.0000E+00*0.8642    * 8.000    *0.1080    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       7962 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ APARTADO a
+ 
+ RAZÓN DE VISITA CPU (Vcpu)            =       15 
+ RAZÓN DE VISITA DISC1 (Vdisco1)       =        7 
+ RAZÓN DE VISITA DISC2 (Vdisco2)       =        7 
+ 
+ TIEMPO DE SERVICIO CPU (Scpu)         =  0.4333E-01
+ TIEMPO DE SERVICIO DISC1 (Sdisco1)    =  0.4333E-01
+ TIEMPO DE SERVICIO DISC2 (Sdisco2)    =  0.4333E-01
+ 
+ *DEMANDA CPU (Dcpu)*                  =  0.6500    
+ *DEMANDA DISC1 (Ddisco1)*             =  0.3033    
+ *DEMANDA DISC2 (Ddisco2)*             =  0.3033    
+ 
+ *DEMANDA DEL SISTEMA (D)*             =   1.257    
+ 
+ *CUELLO DE BOTELLA (Db)*              =  0.6500    
+ 
+ TIEMPO DE REFLEXIÓN (Z)               =   8.000    
+ 
+ *PUNTO DE SATURACIÓN (N*)*            =       14 
+ 
+ APARTADO b
+ 
+ TRABAJOS TOTALES (N)                  =        1 
+ PRODUCTIVIDAD DEL SISTEMA (Xo)        =  0.1080    
+ 
+ *TIEMPO DE RESPUESTA DEL SISTEMA (R)* =   1.257    
+ 
+ *TIEMPO TOTAL DEL SISTEMA (R+Z)*      =   9.257    
+ 
+ *USUARIOS TRABAJANDO*                 =  0.1358    
+ *USUARIOS REFLEXIONANDO*              =  0.8642    
+ 
+1
+ NUMERO DE USUARIOS=        2 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.4333E-01*0.1395    *0.1492    *0.4638E-01* 3.218    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.4333E-01*0.6508E-01*0.6721E-01*0.4475E-01* 1.502    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.4333E-01*0.6508E-01*0.6721E-01*0.4475E-01* 1.502    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 8.000    *0.0000E+00* 1.716    * 8.000    *0.2145    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       7985 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ APARTADO a
+ 
+ RAZÓN DE VISITA CPU (Vcpu)            =       15 
+ RAZÓN DE VISITA DISC1 (Vdisco1)       =        7 
+ RAZÓN DE VISITA DISC2 (Vdisco2)       =        7 
+ 
+ TIEMPO DE SERVICIO CPU (Scpu)         =  0.4333E-01
+ TIEMPO DE SERVICIO DISC1 (Sdisco1)    =  0.4333E-01
+ TIEMPO DE SERVICIO DISC2 (Sdisco2)    =  0.4333E-01
+ 
+ *DEMANDA CPU (Dcpu)*                  =  0.6500    
+ *DEMANDA DISC1 (Ddisco1)*             =  0.3033    
+ *DEMANDA DISC2 (Ddisco2)*             =  0.3033    
+ 
+ *DEMANDA DEL SISTEMA (D)*             =   1.257    
+ 
+ *CUELLO DE BOTELLA (Db)*              =  0.6500    
+ 
+ TIEMPO DE REFLEXIÓN (Z)               =   8.000    
+ 
+ *PUNTO DE SATURACIÓN (N*)*            =       14 
+ 
+ APARTADO b
+ 
+ TRABAJOS TOTALES (N)                  =        2 
+ PRODUCTIVIDAD DEL SISTEMA (Xo)        =  0.2145    
+ 
+ *TIEMPO DE RESPUESTA DEL SISTEMA (R)* =   1.322    
+ 
+ *TIEMPO TOTAL DEL SISTEMA (R+Z)*      =   9.322    
+ 
+ *USUARIOS TRABAJANDO*                 =  0.2837    
+ *USUARIOS REFLEXIONANDO*              =   1.716    
+ 
+1
+ NUMERO DE USUARIOS=        3 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.4333E-01*0.2076    *0.2385    *0.4980E-01* 4.790    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.4333E-01*0.9687E-01*0.1034    *0.4625E-01* 2.235    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.4333E-01*0.9687E-01*0.1034    *0.4625E-01* 2.235    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 8.000    *0.0000E+00* 2.555    * 8.000    *0.3193    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       8008 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ APARTADO a
+ 
+ RAZÓN DE VISITA CPU (Vcpu)            =       15 
+ RAZÓN DE VISITA DISC1 (Vdisco1)       =        7 
+ RAZÓN DE VISITA DISC2 (Vdisco2)       =        7 
+ 
+ TIEMPO DE SERVICIO CPU (Scpu)         =  0.4333E-01
+ TIEMPO DE SERVICIO DISC1 (Sdisco1)    =  0.4333E-01
+ TIEMPO DE SERVICIO DISC2 (Sdisco2)    =  0.4333E-01
+ 
+ *DEMANDA CPU (Dcpu)*                  =  0.6500    
+ *DEMANDA DISC1 (Ddisco1)*             =  0.3033    
+ *DEMANDA DISC2 (Ddisco2)*             =  0.3033    
+ 
+ *DEMANDA DEL SISTEMA (D)*             =   1.257    
+ 
+ *CUELLO DE BOTELLA (Db)*              =  0.6500    
+ 
+ TIEMPO DE REFLEXIÓN (Z)               =   8.000    
+ 
+ *PUNTO DE SATURACIÓN (N*)*            =       14 
+ 
+ APARTADO b
+ 
+ TRABAJOS TOTALES (N)                  =        3 
+ PRODUCTIVIDAD DEL SISTEMA (Xo)        =  0.3193    
+ 
+ *TIEMPO DE RESPUESTA DEL SISTEMA (R)* =   1.394    
+ 
+ *TIEMPO TOTAL DEL SISTEMA (R+Z)*      =   9.394    
+ 
+ *USUARIOS TRABAJANDO*                 =  0.4453    
+ *USUARIOS REFLEXIONANDO*              =   2.555    
+ 
+1
+ NUMERO DE USUARIOS=        4 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.4333E-01*0.2744    *0.3399    *0.5367E-01* 6.333    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.4333E-01*0.1281    *0.1413    *0.4781E-01* 2.955    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.4333E-01*0.1281    *0.1413    *0.4781E-01* 2.955    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 8.000    *0.0000E+00* 3.378    * 8.000    *0.4222    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       8031 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ APARTADO a
+ 
+ RAZÓN DE VISITA CPU (Vcpu)            =       15 
+ RAZÓN DE VISITA DISC1 (Vdisco1)       =        7 
+ RAZÓN DE VISITA DISC2 (Vdisco2)       =        7 
+ 
+ TIEMPO DE SERVICIO CPU (Scpu)         =  0.4333E-01
+ TIEMPO DE SERVICIO DISC1 (Sdisco1)    =  0.4333E-01
+ TIEMPO DE SERVICIO DISC2 (Sdisco2)    =  0.4333E-01
+ 
+ *DEMANDA CPU (Dcpu)*                  =  0.6500    
+ *DEMANDA DISC1 (Ddisco1)*             =  0.3033    
+ *DEMANDA DISC2 (Ddisco2)*             =  0.3033    
+ 
+ *DEMANDA DEL SISTEMA (D)*             =   1.257    
+ 
+ *CUELLO DE BOTELLA (Db)*              =  0.6500    
+ 
+ TIEMPO DE REFLEXIÓN (Z)               =   8.000    
+ 
+ *PUNTO DE SATURACIÓN (N*)*            =       14 
+ 
+ APARTADO b
+ 
+ TRABAJOS TOTALES (N)                  =        4 
+ PRODUCTIVIDAD DEL SISTEMA (Xo)        =  0.4222    
+ 
+ *TIEMPO DE RESPUESTA DEL SISTEMA (R)* =   1.474    
+ 
+ *TIEMPO TOTAL DEL SISTEMA (R+Z)*      =   9.474    
+ 
+ *USUARIOS TRABAJANDO*                 =  0.6225    
+ *USUARIOS REFLEXIONANDO*              =   3.378    
+ 
+1
+ NUMERO DE USUARIOS=        5 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.4333E-01*0.3398    *0.4553    *0.5806E-01* 7.842    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.4333E-01*0.1586    *0.1810    *0.4946E-01* 3.660    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.4333E-01*0.1586    *0.1810    *0.4946E-01* 3.660    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 8.000    *0.0000E+00* 4.183    * 8.000    *0.5228    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       8054 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ APARTADO a
+ 
+ RAZÓN DE VISITA CPU (Vcpu)            =       15 
+ RAZÓN DE VISITA DISC1 (Vdisco1)       =        7 
+ RAZÓN DE VISITA DISC2 (Vdisco2)       =        7 
+ 
+ TIEMPO DE SERVICIO CPU (Scpu)         =  0.4333E-01
+ TIEMPO DE SERVICIO DISC1 (Sdisco1)    =  0.4333E-01
+ TIEMPO DE SERVICIO DISC2 (Sdisco2)    =  0.4333E-01
+ 
+ *DEMANDA CPU (Dcpu)*                  =  0.6500    
+ *DEMANDA DISC1 (Ddisco1)*             =  0.3033    
+ *DEMANDA DISC2 (Ddisco2)*             =  0.3033    
+ 
+ *DEMANDA DEL SISTEMA (D)*             =   1.257    
+ 
+ *CUELLO DE BOTELLA (Db)*              =  0.6500    
+ 
+ TIEMPO DE REFLEXIÓN (Z)               =   8.000    
+ 
+ *PUNTO DE SATURACIÓN (N*)*            =       14 
+ 
+ APARTADO b
+ 
+ TRABAJOS TOTALES (N)                  =        5 
+ PRODUCTIVIDAD DEL SISTEMA (Xo)        =  0.5228    
+ 
+ *TIEMPO DE RESPUESTA DEL SISTEMA (R)* =   1.563    
+ 
+ *TIEMPO TOTAL DEL SISTEMA (R+Z)*      =   9.563    
+ 
+ *USUARIOS TRABAJANDO*                 =  0.8173    
+ *USUARIOS REFLEXIONANDO*              =   4.183    
+ 
+1
+ NUMERO DE USUARIOS=        6 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.4333E-01*0.4036    *0.5874    *0.6306E-01* 9.314    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.4333E-01*0.1884    *0.2224    *0.5118E-01* 4.347    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.4333E-01*0.1884    *0.2224    *0.5118E-01* 4.347    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 8.000    *0.0000E+00* 4.968    * 8.000    *0.6210    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       8077 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ APARTADO a
+ 
+ RAZÓN DE VISITA CPU (Vcpu)            =       15 
+ RAZÓN DE VISITA DISC1 (Vdisco1)       =        7 
+ RAZÓN DE VISITA DISC2 (Vdisco2)       =        7 
+ 
+ TIEMPO DE SERVICIO CPU (Scpu)         =  0.4333E-01
+ TIEMPO DE SERVICIO DISC1 (Sdisco1)    =  0.4333E-01
+ TIEMPO DE SERVICIO DISC2 (Sdisco2)    =  0.4333E-01
+ 
+ *DEMANDA CPU (Dcpu)*                  =  0.6500    
+ *DEMANDA DISC1 (Ddisco1)*             =  0.3033    
+ *DEMANDA DISC2 (Ddisco2)*             =  0.3033    
+ 
+ *DEMANDA DEL SISTEMA (D)*             =   1.257    
+ 
+ *CUELLO DE BOTELLA (Db)*              =  0.6500    
+ 
+ TIEMPO DE REFLEXIÓN (Z)               =   8.000    
+ 
+ *PUNTO DE SATURACIÓN (N*)*            =       14 
+ 
+ APARTADO b
+ 
+ TRABAJOS TOTALES (N)                  =        6 
+ PRODUCTIVIDAD DEL SISTEMA (Xo)        =  0.6210    
+ 
+ *TIEMPO DE RESPUESTA DEL SISTEMA (R)* =   1.662    
+ 
+ *TIEMPO TOTAL DEL SISTEMA (R+Z)*      =   9.662    
+ 
+ *USUARIOS TRABAJANDO*                 =   1.032    
+ *USUARIOS REFLEXIONANDO*              =   4.968    
+ 
+1
+ NUMERO DE USUARIOS=        7 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.4333E-01*0.4655    *0.7390    *0.6879E-01* 10.74    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.4333E-01*0.2173    *0.2656    *0.5297E-01* 5.014    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.4333E-01*0.2173    *0.2656    *0.5297E-01* 5.014    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 8.000    *0.0000E+00* 5.730    * 8.000    *0.7162    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       8100 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ APARTADO a
+ 
+ RAZÓN DE VISITA CPU (Vcpu)            =       15 
+ RAZÓN DE VISITA DISC1 (Vdisco1)       =        7 
+ RAZÓN DE VISITA DISC2 (Vdisco2)       =        7 
+ 
+ TIEMPO DE SERVICIO CPU (Scpu)         =  0.4333E-01
+ TIEMPO DE SERVICIO DISC1 (Sdisco1)    =  0.4333E-01
+ TIEMPO DE SERVICIO DISC2 (Sdisco2)    =  0.4333E-01
+ 
+ *DEMANDA CPU (Dcpu)*                  =  0.6500    
+ *DEMANDA DISC1 (Ddisco1)*             =  0.3033    
+ *DEMANDA DISC2 (Ddisco2)*             =  0.3033    
+ 
+ *DEMANDA DEL SISTEMA (D)*             =   1.257    
+ 
+ *CUELLO DE BOTELLA (Db)*              =  0.6500    
+ 
+ TIEMPO DE REFLEXIÓN (Z)               =   8.000    
+ 
+ *PUNTO DE SATURACIÓN (N*)*            =       14 
+ 
+ APARTADO b
+ 
+ TRABAJOS TOTALES (N)                  =        7 
+ PRODUCTIVIDAD DEL SISTEMA (Xo)        =  0.7162    
+ 
+ *TIEMPO DE RESPUESTA DEL SISTEMA (R)* =   1.773    
+ 
+ *TIEMPO TOTAL DEL SISTEMA (R+Z)*      =   9.773    
+ 
+ *USUARIOS TRABAJANDO*                 =   1.270    
+ *USUARIOS REFLEXIONANDO*              =   5.730    
+ 
+1
+ NUMERO DE USUARIOS=        8 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.4333E-01*0.5253    *0.9136    *0.7536E-01* 12.12    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.4333E-01*0.2452    *0.3103    *0.5484E-01* 5.658    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.4333E-01*0.2452    *0.3103    *0.5484E-01* 5.658    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 8.000    *0.0000E+00* 6.466    * 8.000    *0.8082    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       8123 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ APARTADO a
+ 
+ RAZÓN DE VISITA CPU (Vcpu)            =       15 
+ RAZÓN DE VISITA DISC1 (Vdisco1)       =        7 
+ RAZÓN DE VISITA DISC2 (Vdisco2)       =        7 
+ 
+ TIEMPO DE SERVICIO CPU (Scpu)         =  0.4333E-01
+ TIEMPO DE SERVICIO DISC1 (Sdisco1)    =  0.4333E-01
+ TIEMPO DE SERVICIO DISC2 (Sdisco2)    =  0.4333E-01
+ 
+ *DEMANDA CPU (Dcpu)*                  =  0.6500    
+ *DEMANDA DISC1 (Ddisco1)*             =  0.3033    
+ *DEMANDA DISC2 (Ddisco2)*             =  0.3033    
+ 
+ *DEMANDA DEL SISTEMA (D)*             =   1.257    
+ 
+ *CUELLO DE BOTELLA (Db)*              =  0.6500    
+ 
+ TIEMPO DE REFLEXIÓN (Z)               =   8.000    
+ 
+ *PUNTO DE SATURACIÓN (N*)*            =       14 
+ 
+ APARTADO b
+ 
+ TRABAJOS TOTALES (N)                  =        8 
+ PRODUCTIVIDAD DEL SISTEMA (Xo)        =  0.8082    
+ 
+ *TIEMPO DE RESPUESTA DEL SISTEMA (R)* =   1.898    
+ 
+ *TIEMPO TOTAL DEL SISTEMA (R+Z)*      =   9.898    
+ 
+ *USUARIOS TRABAJANDO*                 =   1.534    
+ *USUARIOS REFLEXIONANDO*              =   6.466    
+ 
+1
+ NUMERO DE USUARIOS=        9 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.4333E-01*0.5827    * 1.115    *0.8292E-01* 13.45    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.4333E-01*0.2719    *0.3563    *0.5678E-01* 6.276    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.4333E-01*0.2719    *0.3563    *0.5678E-01* 6.276    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 8.000    *0.0000E+00* 7.172    * 8.000    *0.8965    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       8146 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ APARTADO a
+ 
+ RAZÓN DE VISITA CPU (Vcpu)            =       15 
+ RAZÓN DE VISITA DISC1 (Vdisco1)       =        7 
+ RAZÓN DE VISITA DISC2 (Vdisco2)       =        7 
+ 
+ TIEMPO DE SERVICIO CPU (Scpu)         =  0.4333E-01
+ TIEMPO DE SERVICIO DISC1 (Sdisco1)    =  0.4333E-01
+ TIEMPO DE SERVICIO DISC2 (Sdisco2)    =  0.4333E-01
+ 
+ *DEMANDA CPU (Dcpu)*                  =  0.6500    
+ *DEMANDA DISC1 (Ddisco1)*             =  0.3033    
+ *DEMANDA DISC2 (Ddisco2)*             =  0.3033    
+ 
+ *DEMANDA DEL SISTEMA (D)*             =   1.257    
+ 
+ *CUELLO DE BOTELLA (Db)*              =  0.6500    
+ 
+ TIEMPO DE REFLEXIÓN (Z)               =   8.000    
+ 
+ *PUNTO DE SATURACIÓN (N*)*            =       14 
+ 
+ APARTADO b
+ 
+ TRABAJOS TOTALES (N)                  =        9 
+ PRODUCTIVIDAD DEL SISTEMA (Xo)        =  0.8965    
+ 
+ *TIEMPO DE RESPUESTA DEL SISTEMA (R)* =   2.039    
+ 
+ *TIEMPO TOTAL DEL SISTEMA (R+Z)*      =   10.04    
+ 
+ *USUARIOS TRABAJANDO*                 =   1.828    
+ *USUARIOS REFLEXIONANDO*              =   7.172    
+ 
+1
+ NUMERO DE USUARIOS=       10 
+ - MEAN VALUE ANALYSIS ("MVA") -
+ *******************************************************************
+ *   NAME   *  SERVICE * BUSY PCT *  CUST NB * RESPONSE *  THRUPUT *
+ *******************************************************************
+ *          *          *          *          *          *          *
+ *CPU       *0.4333E-01*0.6374    * 1.348    *0.9165E-01* 14.71    *
+ *          *          *          *          *          *          *
+ *DISC   1  *0.4333E-01*0.2975    *0.4034    *0.5877E-01* 6.864    *
+ *          *          *          *          *          *          *
+ *DISC   2  *0.4333E-01*0.2975    *0.4034    *0.5877E-01* 6.864    *
+ *          *          *          *          *          *          *
+ *TERMINAL  * 8.000    *0.0000E+00* 7.845    * 8.000    *0.9806    *
+ *          *          *          *          *          *          *
+ *******************************************************************
+              MEMORY USED:       8169 WORDS OF 4 BYTES
+               (  0.16  % OF TOTAL MEMORY)
+ 
+ APARTADO a
+ 
+ RAZÓN DE VISITA CPU (Vcpu)            =       15 
+ RAZÓN DE VISITA DISC1 (Vdisco1)       =        7 
+ RAZÓN DE VISITA DISC2 (Vdisco2)       =        7 
+ 
+ TIEMPO DE SERVICIO CPU (Scpu)         =  0.4333E-01
+ TIEMPO DE SERVICIO DISC1 (Sdisco1)    =  0.4333E-01
+ TIEMPO DE SERVICIO DISC2 (Sdisco2)    =  0.4333E-01
+ 
+ *DEMANDA CPU (Dcpu)*                  =  0.6500    
+ *DEMANDA DISC1 (Ddisco1)*             =  0.3033    
+ *DEMANDA DISC2 (Ddisco2)*             =  0.3033    
+ 
+ *DEMANDA DEL SISTEMA (D)*             =   1.257    
+ 
+ *CUELLO DE BOTELLA (Db)*              =  0.6500    
+ 
+ TIEMPO DE REFLEXIÓN (Z)               =   8.000    
+ 
+ *PUNTO DE SATURACIÓN (N*)*            =       14 
+ 
+ APARTADO b
+ 
+ TRABAJOS TOTALES (N)                  =       10 
+ PRODUCTIVIDAD DEL SISTEMA (Xo)        =  0.9806    
+ 
+ *TIEMPO DE RESPUESTA DEL SISTEMA (R)* =   2.198    
+ 
+ *TIEMPO TOTAL DEL SISTEMA (R+Z)*      =   10.20    
+ 
+ *USUARIOS TRABAJANDO*                 =   2.155    
+ *USUARIOS REFLEXIONANDO*              =   7.845    
+     75 /END/
